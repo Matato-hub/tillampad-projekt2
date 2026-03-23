@@ -1,0 +1,1 @@
+<module 'mediapipe.python.solutions.hands' from 'C:\\Users\\mathea.frost\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\mediapipe\\python\\solutions\\hands.py'>
