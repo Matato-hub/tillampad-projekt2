@@ -1,18 +1,29 @@
 import cv2 as cv
+import numpy as np
+
 
 
 # reading img
-#img = cv.imread('images/hasse-haj.png')
+img = cv.imread('images/hasse-haj.png')
 
-#cv.imshow('Hasse Haj', img)
+#
 
 # reading videos
 
 capture = cv.VideoCapture(0)
 
+
+
 while True:
+
+
+# concatenate image Horizontally
+    Hori = np.concatenate((capture, img), axis=1)
+# concatenate image Vertically
+    Verti = np.concatenate((capture, img), axis=0)
     isTrue, frame = capture.read()
-    cv.imshow('hoe', frame)
+    cv.imshow('hoe', Hori)
+    cv.imshow('Hasse Haj', Verti)
 
     if cv.waitKey(20) & 0xFF==ord('d'):
         break

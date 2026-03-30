@@ -16,6 +16,7 @@ hands = mp_hands.Hands()    #mphands
 
 
 while True: 
+    points[2][21] 
     data, image = capture.read()
     h, w, c = image.shape
     #FLIP THE image
@@ -34,7 +35,7 @@ while True:
                 # Här räknar vi om dem till pixlar:
                 cx, cy = int(lm.x * w), int(lm.y * h)
                 
-                print(f"Landmark {id}: x={cx}, y={cy}")
+                ##print(f"Landmark {id}: x={cx}, y={cy}")
     cv2.imshow('Handtracker', image)
     if cv2.waitKey(20) & 0xFF==ord('d'):
         break
