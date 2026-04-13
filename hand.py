@@ -1,6 +1,7 @@
 #importing libraries
 import cv2
 import mediapipe as mp
+import numpy as np
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -11,12 +12,12 @@ hands = mp_hands.Hands()    #mphands
 
 
 
-#wCam, hCam = 190, 380d
+wCam, hCam = 190, 380
 
 
 
 while True: 
-    points[2][21] 
+   # points[2][21] (denna var i koden, jag vet inte vad denn gjorde doch och gav error)
     data, image = capture.read()
     h, w, c = image.shape
     #FLIP THE image
@@ -35,7 +36,7 @@ while True:
                 # Här räknar vi om dem till pixlar:
                 cx, cy = int(lm.x * w), int(lm.y * h)
                 
-                ##print(f"Landmark {id}: x={cx}, y={cy}")
+                print(f"Landmark {id}: x={cx}, y={cy}")
     cv2.imshow('Handtracker', image)
     if cv2.waitKey(20) & 0xFF==ord('d'):
         break
