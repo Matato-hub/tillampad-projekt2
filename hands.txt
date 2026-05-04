@@ -1,1 +1,0 @@
-<mediapipe.python.solutions.hands.Hands object at 0x000001DF83DC48D0>
