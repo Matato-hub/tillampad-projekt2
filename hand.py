@@ -2,15 +2,20 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+import random
+
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
-mp_hands = mp.solutions.hands   #ändrade från videon (där hette det mphands)
+mp_hands = mp.solutions.hands 
 
 capture = cv2.VideoCapture(0)
-hands = mp_hands.Hands()    #mphands
+hands = mp_hands.Hands()   
 wCam, hCam = 190, 380
 handList = []
+bot= ["Rock", "Scissors", "Paper"]
+answer = False
+
 
 def scissors(hand_landmarks):
     pointer_up = hand_landmarks.landmark[8].y < hand_landmarks.landmark[5].y
@@ -41,54 +46,71 @@ def paper(hand_landmarks):
     return thumb_up and other_up
 
 
+def bot():
+    bot_answer = bot[random.randint(1,3)-1]
+    return bot_answer
+
+
+    
+
+
 while True: 
-   # points[2][21] (denna var i koden, jag vet inte vad denn gjorde doch och gav error)
-    data, image = capture.read()
+    #points[2][21] (denna var i koden, jag vet inte vad denn gjorde doch och gav error)
+    isTrue, image = capture.read()
+    if not isTrue:
+        break
+
     h, w, c = image.shape
     #FLIP THE image
     image = cv2.cvtColor(cv2.flip(image, 1),cv2.COLOR_BGR2RGB)
     #storing the results
     results = hands.process(image)
-    image = cv2.cvtColor(image,cv2.COLOR_RGB2BGR)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
 
-    if cv2.waitKey(20) & 0xFF==ord('s'):
+
         
-         Bot[3] = {"Rock", "Scissors", "Paper"}
-         player_answer = str()
-        
-         cv2.putText(image, 'CHOOSE: ROCK, PAPER OR SCISSORS', (30,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 1, cv2.LINE_AA)
-         cv2.putText(image, '(Use your right hand, palm towards the camera)', (30, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
-         cv2.putText(image, 'YOU HAVE CHOSEN:', (30,350), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 1, cv2.LINE_AA)
-         if results.multi_hand_landmarks:
-             for hand_landmarks in results.multi_hand_landmarks:
-                 mp_drawing.draw_landmarks(
-                     image,
-                     hand_landmarks, mp_hands.HAND_CONNECTIONS)
-             # Loopa igenom varje enskild punkt (0-21) i handen
-                 for id, lm in enumerate(hand_landmarks.landmark):
+    player_answer = str()
+    
+    cv2.putText(image, 'CHOOSE: ROCK, PAPER OR SCISSORS', (30,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 1, cv2.LINE_AA)
+    cv2.putText(image, '(Use your right hand, palm towards the camera)', (30, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
+    cv2.putText(image, 'YOU HAVE CHOSEN:', (30,350), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 1, cv2.LINE_AA)
+    if results.multi_hand_landmarks:
+        for hand_landmarks in results.multi_hand_landmarks:
+            mp_drawing.draw_landmarks(
+                image,
+                hand_landmarks, mp_hands.HAND_CONNECTIONS)
+            # Loopa igenom varje enskild punkt (0-21) i handen
+            for id, lm in enumerate(hand_landmarks.landmark):
                      # lm.x och lm.y är normaliserade (0.0 till 1.0)
                      # Här räknar vi om dem till pixlar:
-                     cx, cy = int(lm.x * w), int(lm.y * h)
+                cx, cy = int(lm.x * w), int(lm.y * h)
 
-                     print(f"Landmark {id}: x={cx}, y={cy}")
-                 if rock(hand_landmarks):
-                     cv2.putText(image, 'ROCK', (30, 420), cv2.FONT_HERSHEY_SIMPLEX, 3, (195, 0, 255), 2, cv2.LINE_AA)
-                     player_answer = "Rock"
-                 elif scissors(hand_landmarks):
-                     cv2.putText(image, 'SCISSORS', (30, 420), cv2.FONT_HERSHEY_SIMPLEX, 3, (188, 131, 124), 2, cv2.LINE_AA)
-                     player_answer = "Scissors"
-                 elif paper(hand_landmarks):
-                    cv2.putText(image, 'PAPER', (30, 420), cv2.FONT_HERSHEY_SIMPLEX, 3, (60, 20, 220), 2, cv2.LINE_AA)
-                    player_answer = "Paper"
-         cv2.imshow('Handtracker', image)
+            if rock(hand_landmarks):
+                cv2.putText(image, 'ROCK', (30, 420), cv2.FONT_HERSHEY_SIMPLEX, 3, (195, 0, 255), 2, cv2.LINE_AA)
+                player_answer = "Rock"
+            elif scissors(hand_landmarks):
+                cv2.putText(image, 'SCISSORS', (30, 420), cv2.FONT_HERSHEY_SIMPLEX, 3, (188, 131, 124), 2, cv2.LINE_AA)
+                player_answer = "Scissors"
+            elif paper(hand_landmarks):
+                cv2.putText(image, 'PAPER', (30, 420), cv2.FONT_HERSHEY_SIMPLEX, 3, (60, 20, 220), 2, cv2.LINE_AA)
+                player_answer = "Paper"
+
+            if answer == False:
+                bot_answer = bot()
+                answer = True
+            
+            print(bot_answer)
+
+
+
+
+            
+
+
+    cv2.imshow('Handtracker', image)
         
-         if cv2.waitKey(20) & 0xFF==ord('q'):
-            Bot_answer = Bot[random.ranint(1,2,3)]
-            print Bot_answer and player_answer
-
-
-
+   
     
 
 
