@@ -5,6 +5,8 @@ import numpy as np
 import random
 
 
+
+
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands 
@@ -13,8 +15,9 @@ capture = cv2.VideoCapture(0)
 hands = mp_hands.Hands()   
 wCam, hCam = 190, 380
 handList = []
-bot= ["Rock", "Scissors", "Paper"]
+bot_options= ["Rock", "Scissors", "Paper"]
 answer = False
+
 
 
 def scissors(hand_landmarks):
@@ -45,16 +48,40 @@ def paper(hand_landmarks):
     )
     return thumb_up and other_up
 
+def fuckyou(hand_landmarks):
+    middle_up = hand_landmarks.landmark[12].y < hand_landmarks.landmark[9].y
+    other_down = all(
+        hand_landmarks.landmark[tip].y > hand_landmarks.landmark[tip-2].y
+        for tip in [8, 16, 20]
+    )
+    return middle_up and other_down
 
 def bot():
-    bot_answer = bot[random.randint(1,3)-1]
+    bot_answer = bot_options[random.randint(0,2)]
     return bot_answer
 
 
+def who_tf_wins(player_answer, bot_answer):
+    cv2.putText(image, 'The Botato answered: ' +bot_answer, (50,150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
+    cv2.putText(image, 'Press s to reset bot answer', (50,180), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2, cv2.LINE_AA)
+    if player_answer == bot_answer:
+        cv2.putText(image, 'ITS A DRAW!' , (100,250), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 255), 2, cv2.LINE_AA)
+    elif player_answer == "Scissors" and bot_answer == "Paper":
+        cv2.putText(image, 'YOU WIN!', (100, 250), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,255,0), 2, cv2.LINE_AA)
+    elif player_answer == "Paper" and bot_answer == "Rock":
+        cv2.putText(image, 'YOU WIN!', (100, 250), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,255,0), 2, cv2.LINE_AA)
+    elif player_answer == "Rock" and bot_answer == "Scissors":
+        cv2.putText(image, 'YOU WIN!', (100, 250), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,255,0), 2, cv2.LINE_AA)
+    elif bot_answer == "Scissors" and player_answer == "Paper":
+        cv2.putText(image, 'YOU LOSE!', (100, 250), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255), 2, cv2.LINE_AA)
+    elif bot_answer == "Paper" and player_answer == "Rock":
+        cv2.putText(image, 'YOU LOSE!', (100, 250), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255), 2, cv2.LINE_AA)
+    elif bot_answer == "Rock" and player_answer == "Scissors":
+        cv2.putText(image, 'YOU LOSE!', (100, 250), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255), 2, cv2.LINE_AA)
     
 
 
-while True: 
+while True:
     #points[2][21] (denna var i koden, jag vet inte vad denn gjorde doch och gav error)
     isTrue, image = capture.read()
     if not isTrue:
@@ -74,6 +101,7 @@ while True:
     
     cv2.putText(image, 'CHOOSE: ROCK, PAPER OR SCISSORS', (30,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 1, cv2.LINE_AA)
     cv2.putText(image, '(Use your right hand, palm towards the camera)', (30, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
+    cv2.putText(image, '(Choose your sign and press s to find out who wins)', (30, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
     cv2.putText(image, 'YOU HAVE CHOSEN:', (30,350), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 1, cv2.LINE_AA)
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
@@ -86,6 +114,8 @@ while True:
                      # Här räknar vi om dem till pixlar:
                 cx, cy = int(lm.x * w), int(lm.y * h)
 
+
+
             if rock(hand_landmarks):
                 cv2.putText(image, 'ROCK', (30, 420), cv2.FONT_HERSHEY_SIMPLEX, 3, (195, 0, 255), 2, cv2.LINE_AA)
                 player_answer = "Rock"
@@ -95,12 +125,23 @@ while True:
             elif paper(hand_landmarks):
                 cv2.putText(image, 'PAPER', (30, 420), cv2.FONT_HERSHEY_SIMPLEX, 3, (60, 20, 220), 2, cv2.LINE_AA)
                 player_answer = "Paper"
+            elif fuckyou(hand_landmarks):
+                quit()
+
+            if cv2.waitKey(20) & 0xFF==ord('s'):
+                answer = False
 
             if answer == False:
                 bot_answer = bot()
                 answer = True
             
+            who_tf_wins(player_answer, bot_answer)
+
+            print(player_answer)
             print(bot_answer)
+
+
+
 
 
 
